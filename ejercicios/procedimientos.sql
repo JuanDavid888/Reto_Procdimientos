@@ -35,3 +35,30 @@ END $$
 DELIMITER ;
 
 CALL ps_nuevo_cliente('Pedro', 'Jaimes', 'Gonzales', 'Bucaramanga', 100);
+
+-- 2
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ps_actualizar_comision $$
+
+CREATE PROCEDURE ps_actualizar_comision(
+    IN c_comercial_id INT,
+    IN c_comision FLOAT
+)
+BEGIN
+
+    IF c_comision <= 0 THEN
+        SIGNAL SQLSTATE '40001'
+            SET MESSAGE_TEXT = 'La comision debe ser mayor a 0';
+    END IF;
+
+    UPDATE comercial SET comision = c_comision
+    WHERE id = c_comercial_id;
+
+    SELECT * FROM comercial WHERE id = c_comercial_id;
+
+END $$
+
+DELIMITER ;
+
+CALL ps_actualizar_comision(1, 1.20);
