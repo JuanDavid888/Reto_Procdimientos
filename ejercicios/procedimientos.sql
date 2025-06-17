@@ -125,3 +125,27 @@ END $$
 DELIMITER ;
 
 CALL ps_nuevo_pedido(70000, 11, 3);
+
+-- 5
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ps_pedidos_fecha $$
+
+CREATE PROCEDURE ps_pedidos_fecha(
+    IN p_fecha_inicio DATETIME,
+    IN p_fecha_fin DATETIME
+)
+BEGIN
+
+    IF p_fecha_inicio IS NULL THEN
+        SIGNAL SQLSTATE '40001'
+            SET MESSAGE_TEXT = 'Debe ingresar una fecha inicial de busqueda';
+    END IF;
+
+    SELECT * FROM pedido WHERE fecha BETWEEN p_fecha_inicio AND p_fecha_fin;
+
+END $$
+
+DELIMITER ;
+
+CALL ps_pedidos_fecha('2025-06-01', '2025-12-31');
