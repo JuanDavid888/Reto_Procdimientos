@@ -85,3 +85,43 @@ END $$
 DELIMITER ;
 
 CALL ps_eliminar_pedidos(1);
+
+-- 4
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ps_nuevo_pedido $$
+
+CREATE PROCEDURE ps_nuevo_pedido(
+    IN p_total DOUBLE,
+    IN p_cliente_id INT,
+    IN p_comercial_id INT
+)
+BEGIN
+    DECLARE p_pedido_id INT;
+
+    IF p_total <= 0 THEN
+        SIGNAL SQLSTATE '40001'
+            SET MESSAGE_TEXT = 'El total debe ser mayor a 0';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM cliente WHERE id = p_cliente_id) THEN
+        SIGNAL SQLSTATE '40002'
+            SET MESSAGE_TEXT = 'El cliente seleccionado no existe';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM comercial WHERE id = p_comercial_id) THEN
+        SIGNAL SQLSTATE '40002'
+            SET MESSAGE_TEXT = 'El comercial seleccionado no existe';
+    END IF;
+
+    INSERT INTO pedido(total, fecha, id_cliente, id_comercial)
+    VALUES(p_total, NOW(), p_cliente_id, p_comercial_id);
+    SET p_pedido_id = LAST_INSERT_ID();
+
+    SELECT * FROM pedido WHERE id = p_pedido_id;
+
+END $$
+
+DELIMITER ;
+
+CALL ps_nuevo_pedido(70000, 11, 3);
