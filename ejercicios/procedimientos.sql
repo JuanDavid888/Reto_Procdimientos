@@ -62,3 +62,26 @@ END $$
 DELIMITER ;
 
 CALL ps_actualizar_comision(1, 1.20);
+
+-- 3
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ps_eliminar_pedidos $$
+
+CREATE PROCEDURE ps_eliminar_pedidos(
+    IN c_cliente_id INT
+)
+BEGIN
+
+    IF NOT EXISTS (SELECT 1 FROM cliente WHERE id = c_cliente_id) THEN
+        SIGNAL SQLSTATE '40002'
+            SET MESSAGE_TEXT = 'El cliente seleccionado no existe';
+    END IF;
+
+    DELETE FROM pedido WHERE id_cliente = c_cliente_id;
+
+END $$
+
+DELIMITER ;
+
+CALL ps_eliminar_pedidos(1);
